@@ -1,0 +1,782 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AL: ArtificialL1fe | Interstellar Civilization</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <style>
+        /* Load fonts */
+        @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Roboto+Mono:wght@300;500&display=swap');
+        :root {
+            --accent-color: #ffffff;
+            --hero-title-color: #ffffff;
+            --contact-glow: #7000ff;
+
+            /* Colors - White/Black Theme */
+            --timeline-color: #ffffff;
+            --milestone-color: #ffffff;
+            --arrow-color: #ffffff;
+
+            /* Path Notes Colors */
+            --path-notes-bg: rgba(0, 0, 0, 0.9);
+            --path-notes-border: rgba(255, 255, 255, 0.5);
+            --path-notes-glow: #ffffff;
+        }
+        body, html {
+            margin: 0;
+            padding: 0;
+            background-color: #050505;
+            color: #ffffff;
+            font-family: 'Roboto Mono', monospace;
+            overflow-x: hidden;
+            height: 100%;
+        }
+        /* --- BACKGROUND CANVAS --- */
+        canvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            z-index: 0;
+        }
+        /* --- NAVIGATION --- */
+        nav {
+            position: fixed;
+            top: 0;
+            width: 100%;
+            height: 80px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            z-index: 100;
+            background: rgba(5, 5, 5, 0.8);
+            backdrop-filter: blur(10px);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+            padding: 0 40px;
+            box-sizing: border-box;
+        }
+
+        /* --- LOGO STYLES --- */
+        .logo-link {
+            display: block;
+            position: relative;
+            width: 60px;
+            height: 60px;
+            transition: all 0.3s ease;
+        }
+        .logo-container {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 100%;
+            height: 100%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        .logo-line {
+            position: absolute;
+            background-color: white;
+            border-radius: 3px;
+            transition: all 0.3s ease;
+        }
+        .logo-line:hover,
+        .logo-link:hover .logo-line {
+            box-shadow: 0 0 10px white;
+        }
+        /* Logo Lines Alignment */
+        .line-1 { width: 30px; height: 4px; transform: rotate(-58deg) translateY(3px) translateX(-11px); }
+        .line-2 { width: 52px; height: 4px; transform: rotate(50deg) translateY(-4px) translateX(4px); }
+        .line-3 { width: 29px; height: 4px; transform: rotate(1190deg) translateY(-27px) translateX(-2px); }
+
+        /* --- DESKTOP NAV LINKS --- */
+        .nav-links-container {
+            display: flex;
+            gap: 60px;
+        }
+        .nav-link {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 1.1rem;
+            color: rgba(255, 255, 255, 0.5);
+            text-transform: uppercase;
+            text-decoration: none;
+            cursor: pointer;
+            letter-spacing: 3px;
+            position: relative;
+            padding: 10px 0;
+            transition: color 0.3s ease;
+        }
+        .nav-link:hover, .nav-link.active {
+            color: var(--accent-color);
+            text-shadow: 0 0 15px rgba(255, 255, 255, 0.8);
+        }
+        .nav-link.active::after {
+            content: '';
+            position: absolute;
+            bottom: 0px;
+            left: 0;
+            width: 100%;
+            height: 2px;
+            background: var(--accent-color);
+            box-shadow: 0 0 10px var(--accent-color);
+        }
+
+        /* --- MOBILE HAMBURGER MENU --- */
+        .hamburger {
+            display: none;
+            flex-direction: column;
+            cursor: pointer;
+            gap: 6px;
+            z-index: 101;
+        }
+        .bar { width: 30px; height: 3px; background-color: #fff; transition: 0.3s; border-radius: 2px; }
+        .hamburger.active .bar:nth-child(2) { opacity: 0; }
+        .hamburger.active .bar:nth-child(1) { transform: translateY(9px) rotate(45deg); }
+        .hamburger.active .bar:nth-child(3) { transform: translateY(-9px) rotate(-45deg); }
+
+        /* --- MAIN LAYOUT --- */
+        .container {
+            position: relative;
+            z-index: 10;
+            width: 100%;
+            min-height: 100vh;
+            padding-top: 80px;
+        }
+        
+        /* --- HOME SECTION --- */
+        #home-section {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 20px 20px 0px 20px;
+            min-height: calc(100vh - 80px);
+            animation: fadeIn 1s ease;
+        }
+        .new-hero-text {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 1.2rem;
+            text-align: center;
+            max-width: 1000px;
+            line-height: 1.6;
+            padding: 20px;
+            margin-bottom: 30px;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            color: var(--hero-title-color);
+            text-shadow: 0 0 10px rgba(255, 255, 255, 0.5);
+        }
+
+        /* --- TIMELINE STYLES --- */
+        .timeline-section {
+            width: 100%;
+            max-width: 1200px;
+            margin: 40px auto 0 auto;
+            position: relative;
+            padding: 40px 0;
+        }
+        .timeline-title {
+            font-family: 'Orbitron';
+            color: var(--timeline-color);
+            text-align: center;
+            margin-bottom: 100px;
+            font-size: 1.5rem;
+            letter-spacing: 3px;
+            text-shadow: 0 0 15px var(--timeline-color);
+        }
+        .timeline-wrapper {
+            position: relative;
+            width: 85%;
+            margin: 0 auto;
+        }
+        .timeline-path {
+            position: relative;
+            width: 100%;
+            height: 6px;
+            background: linear-gradient(to right, transparent, var(--timeline-color), var(--timeline-color), transparent);
+            box-shadow: 0 0 20px rgba(255, 255, 255, 0.8);
+            border-radius: 3px;
+        }
+        .timeline-path::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: repeating-linear-gradient(-45deg, rgba(255,255,255,0.4), rgba(255,255,255,0.4) 10px, transparent 10px, transparent 20px);
+            animation: flowDataStream 10s infinite linear;
+            border-radius: 3px;
+        }
+        
+        .milestone-container {
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 100%;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            z-index: 10;
+        }
+        .milestone {
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            width: 20px;
+            cursor: pointer;
+        }
+        
+        /* Node Dot */
+        .milestone-dot {
+            width: 22px;
+            height: 22px;
+            border-radius: 50%;
+            background: #fff;
+            border: 4px solid #050505;
+            box-shadow: 0 0 20px #fff;
+            position: relative;
+            z-index: 20;
+            transition: all 0.3s ease;
+        }
+        .milestone:hover .milestone-dot {
+            transform: scale(1.3);
+            box-shadow: 0 0 35px #fff;
+            background: #e0e0e0;
+        }
+
+        /* Year above line */
+        .milestone-year {
+            font-family: 'Orbitron';
+            color: var(--timeline-color);
+            position: absolute;
+            top: -45px;
+            font-size: 1.3rem;
+            font-weight: bold;
+            white-space: nowrap;
+            text-shadow: 0 0 10px var(--timeline-color);
+            transition: all 0.3s;
+        }
+        
+        /* Name below line */
+        .milestone-project {
+            font-family: 'Orbitron';
+            color: var(--accent-color);
+            position: absolute;
+            bottom: -45px;
+            font-size: 1.1rem;
+            white-space: nowrap;
+            text-shadow: 0 0 10px #000;
+            transition: all 0.3s;
+        }
+
+        /* --- PREVIEW WINDOW (HOVER EFFECT) --- */
+        .preview-window {
+            position: absolute;
+            bottom: 60px; /* Appear above the node */
+            left: 50%;
+            transform: translateX(-50%) translateY(15px);
+            width: 260px;
+            background: rgba(10, 10, 15, 0.95);
+            border: 1px solid rgba(255, 255, 255, 0.6);
+            box-shadow: 0 0 30px rgba(255, 255, 255, 0.2);
+            padding: 8px;
+            border-radius: 6px;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            z-index: 100;
+            cursor: pointer;
+        }
+        .preview-window:hover {
+            box-shadow: 0 0 40px rgba(255, 255, 255, 0.4);
+            border-color: #fff;
+        }
+        
+        /* Invisible Bridge to keep hover active when moving mouse up */
+        .preview-window::after {
+            content: '';
+            position: absolute;
+            top: 100%;
+            left: -20px;
+            right: -20px;
+            height: 50px;
+            background: transparent;
+        }
+        
+        /* Hover Triggers */
+        .milestone:hover .preview-window {
+            opacity: 1;
+            visibility: visible;
+            transform: translateX(-50%) translateY(0);
+        }
+        .milestone:hover .milestone-year {
+            opacity: 0; /* Hide the year so it doesn't overlap behind the window */
+            transform: translateY(10px);
+        }
+
+        .preview-image {
+            width: 100%;
+            height: 140px;
+            object-fit: cover;
+            border-radius: 4px;
+            border: 1px solid rgba(255,255,255,0.2);
+        }
+        .preview-text {
+            font-family: 'Orbitron', sans-serif;
+            text-align: center;
+            padding-top: 12px;
+            padding-bottom: 5px;
+        }
+        .preview-title {
+            font-size: 1rem;
+            color: #fff;
+            margin: 0 0 6px 0;
+            letter-spacing: 1px;
+            text-shadow: 0 0 8px rgba(255,255,255,0.8);
+        }
+        .preview-subtitle {
+            font-size: 0.7rem;
+            color: #aaa;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+        }
+
+        /* Timeline Arrows */
+        .timeline-arrow {
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            z-index: 50;
+            color: rgba(255,255,255,0.6);
+            font-size: 3rem;
+            cursor: pointer;
+            text-shadow: 0 0 15px rgba(255,255,255,0.4);
+            transition: all 0.3s;
+        }
+        .timeline-arrow:hover {
+            color: #fff;
+            transform: translateY(-50%) scale(1.1);
+            text-shadow: 0 0 30px #fff;
+        }
+        .arrow-left { left: -60px; }
+        .arrow-right { right: -60px; }
+
+        /* --- LIGHTBOX (FULLSCREEN IMAGE) --- */
+        .lightbox {
+            display: none;
+            position: fixed;
+            z-index: 9999;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.92);
+            backdrop-filter: blur(8px);
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+            animation: fadeIn 0.4s ease;
+        }
+        .lightbox-content {
+            max-width: 90%;
+            max-height: 80vh;
+            border: 2px solid rgba(255, 255, 255, 0.5);
+            box-shadow: 0 0 50px rgba(255, 255, 255, 0.3);
+            border-radius: 8px;
+            object-fit: contain;
+        }
+        .lightbox-close {
+            position: absolute;
+            top: 30px;
+            right: 40px;
+            color: #fff;
+            font-size: 50px;
+            font-family: 'Roboto Mono', monospace;
+            cursor: pointer;
+            transition: all 0.3s;
+            text-shadow: 0 0 15px rgba(255,255,255,0.5);
+        }
+        .lightbox-close:hover {
+            color: #aaa;
+            transform: scale(1.1);
+        }
+        .lightbox-caption {
+            margin-top: 25px;
+            font-family: 'Orbitron', sans-serif;
+            color: #fff;
+            font-size: 1.8rem;
+            letter-spacing: 3px;
+            text-shadow: 0 0 20px #fff;
+        }
+
+        /* --- OTHER SECTIONS (PATH NOTES, CONTACT, ETC) --- */
+        /* (Unchanged from your original code to preserve functionality) */
+        #path-notes-section {
+            display: none; flex-direction: column; align-items: center;
+            padding: 60px 20px 100px 20px; min-height: calc(100vh - 80px);
+            animation: fadeIn 1s ease; max-width: 1000px; margin: 0 auto;
+        }
+        .path-notes-content { width: 100%; max-width: 800px; margin-top: 50px; text-align: left; }
+        .path-notes-content h2 {
+            font-family: 'Orbitron'; font-size: 1.8rem; color: var(--path-notes-glow);
+            margin-bottom: 30px; border-bottom: 2px solid rgba(255, 255, 255, 0.5);
+            padding-bottom: 10px; text-align: center; text-shadow: 0 0 10px var(--path-notes-glow);
+        }
+        .accordion-item {
+            width: 100%; margin-bottom: 20px; border: 1px solid var(--timeline-color);
+            background: rgba(0, 0, 0, 0.6); border-radius: 5px; overflow: hidden;
+            box-shadow: 0 0 10px rgba(255, 255, 255, 0.1); transition: box-shadow 0.3s;
+        }
+        .accordion-item:hover { box-shadow: 0 0 20px rgba(255, 255, 255, 0.3); }
+        .accordion-header {
+            width: 100%; padding: 20px; background: rgba(255, 255, 255, 0.05);
+            cursor: pointer; display: flex; justify-content: space-between; align-items: center;
+        }
+        .accordion-header:hover { background: rgba(255, 255, 255, 0.15); }
+        .header-title { font-family: 'Orbitron'; font-size: 1.1rem; color: #ffffff; letter-spacing: 1px; margin: 0; }
+        .header-icon { color: #ffffff; transition: transform 0.3s ease; }
+        .accordion-content {
+            display: none; padding: 25px; border-top: 1px solid rgba(255, 255, 255, 0.2);
+            background: rgba(0, 0, 0, 0.4); animation: slideDown 0.3s ease-out;
+        }
+        .content-full-title {
+            font-family: 'Orbitron'; font-size: 1.3rem; color: #ffffff;
+            margin-top: 0; margin-bottom: 20px; text-shadow: 0 0 10px rgba(255,255,255,0.5);
+            border-bottom: 1px solid rgba(255,255,255,0.2); padding-bottom: 10px;
+        }
+        .content-text { font-size: 1rem; line-height: 1.6; color: #ddd; margin-bottom: 20px; }
+        .feature-list { list-style: none; padding: 0; margin: 10px 0 0 0; }
+        .feature-list li {
+            font-size: 0.95rem; color: #ccc; padding: 8px 0; border-left: 2px solid rgba(255, 255, 255, 0.3);
+            padding-left: 15px; margin-left: 5px; position: relative; margin-bottom: 5px;
+            background: linear-gradient(90deg, rgba(255,255,255,0.05) 0%, transparent 100%);
+        }
+        .feature-list li strong { color: #ffffff; font-family: 'Orbitron'; font-size: 0.9rem; margin-right: 5px; }
+
+        /* --- PALE BLUE DOT SECTION --- */
+        #pale-blue-dot-section {
+            display: none; flex-direction: column; align-items: center; padding: 60px 20px 100px 20px;
+            min-height: calc(100vh - 80px); animation: fadeIn 1s ease; max-width: 1000px; margin: 0 auto;
+        }
+        .pale-blue-dot-content { width: 100%; max-width: 800px; margin-top: 50px; text-align: center; }
+        .pale-blue-dot-content h2 {
+            font-family: 'Orbitron'; font-size: 1.8rem; color: var(--path-notes-glow); margin-bottom: 30px;
+            border-bottom: 2px solid rgba(0, 255, 255, 0.5); padding-bottom: 10px; text-shadow: 0 0 10px var(--path-notes-glow);
+        }
+        .pale-blue-dot-content img { max-width: 100%; height: auto; border-radius: 8px; margin-bottom: 30px; box-shadow: 0 0 20px rgba(255, 255, 255, 0.2); }
+        .pale-blue-dot-content p { font-size: 1rem; line-height: 1.6; color: #ddd; text-align: justify; margin-bottom: 20px; text-shadow: 0 0 2px #000; }
+        .quote-author { font-style: italic; text-align: right; color: #aaa; margin-top: 20px; }
+
+        /* --- CONTACT SECTION --- */
+        #contact-section {
+            display: none; flex-direction: column; align-items: center; padding: 60px 20px 100px 20px;
+            min-height: calc(100vh - 80px); animation: fadeIn 1s ease;
+        }
+        .contact-content { width: 100%; max-width: 900px; margin: 0 auto; }
+        .map-container { width: 100%; height: 400px; margin-bottom: 60px; border: 2px solid var(--contact-glow); box-shadow: 0 0 20px rgba(112, 0, 255, 0.5); border-radius: 8px; overflow: hidden; }
+        .contact-form-card { background: rgba(10, 0, 30, 0.6); padding: 40px; border-radius: 12px; border: 1px solid rgba(112, 0, 255, 0.4); box-shadow: 0 0 30px rgba(112, 0, 255, 0.3); }
+        .contact-form-card h2 { font-family: 'Orbitron'; color: var(--contact-glow); text-align: center; margin-bottom: 30px; letter-spacing: 2px; border-bottom: 1px solid rgba(112, 0, 255, 0.5); padding-bottom: 10px; }
+        .form-group { margin-bottom: 20px; }
+        .form-group label { display: block; margin-bottom: 8px; color: var(--accent-color); font-size: 0.9rem; }
+        .form-group input, .form-group textarea { width: 100%; padding: 12px; background: rgba(0, 0, 0, 0.7); border: 1px solid #333; color: var(--accent-color); border-radius: 6px; font-family: 'Roboto Mono'; box-sizing: border-box; }
+        .form-group input:focus, .form-group textarea:focus { outline: none; border-color: var(--contact-glow); box-shadow: 0 0 10px var(--contact-glow); }
+        .form-group textarea { resize: vertical; min-height: 100px; }
+        .contact-btn { width: 100%; padding: 15px; background: var(--contact-glow); border: none; color: #fff; font-family: 'Orbitron'; font-size: 1.1rem; letter-spacing: 2px; cursor: pointer; border-radius: 6px; transition: background 0.3s, box-shadow 0.3s; text-transform: uppercase; }
+        .contact-btn:hover { background: #a855f7; box-shadow: 0 0 25px var(--contact-glow); }
+
+        /* --- MEDIA QUERIES --- */
+        @media (max-width: 950px) {
+            .timeline-wrapper { width: 90%; }
+        }
+        @media (max-width: 768px) {
+            .hamburger { display: flex; }
+            .nav-links-container {
+                position: fixed; top: 80px; right: -100%; width: 100%; height: calc(100vh - 80px);
+                background: rgba(5, 5, 5, 0.95); backdrop-filter: blur(15px); flex-direction: column;
+                justify-content: center; align-items: center; gap: 40px; transition: 0.4s ease-in-out;
+            }
+            .nav-links-container.mobile-active { right: 0; }
+            .nav-link { font-size: 1.5rem; width: 100%; text-align: center; }
+            
+            .timeline-arrow { display: none; }
+            .milestone-year { font-size: 1rem; top: -35px; }
+            .milestone-project { font-size: 0.9rem; bottom: -35px; }
+            .preview-window { width: 200px; }
+            .preview-image { height: 100px; }
+        }
+
+        /* --- ANIMATIONS --- */
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+        @keyframes flowDataStream { 0% { background-position: 0 0; } 100% { background-position: -200px 0; } }
+        @keyframes slideDown { from { opacity: 0; transform: translateY(-10px); } to { opacity: 1; transform: translateY(0); } }
+    </style>
+</head>
+<body onload="init(); animate(); renderTimeline(); switchTab('home');">
+
+    <canvas id="neuroCanvas"></canvas>
+
+    <nav>
+        <a href="#home-section" class="logo-link">
+            <div class="logo-container">
+                <div class="logo-line line-1"></div>
+                <div class="logo-line line-2"></div>
+                <div class="logo-line line-3"></div>
+            </div>
+        </a>
+        
+        <div class="hamburger" onclick="toggleMobileMenu()">
+            <div class="bar"></div>
+            <div class="bar"></div>
+            <div class="bar"></div>
+        </div>
+
+        <div class="nav-links-container" id="navLinks">
+            <a class="nav-link active" id="home-nav" onclick="switchTab('home'); toggleMobileMenu()">HOME</a>
+            <a class="nav-link" id="path-notes-nav" onclick="switchTab('path-notes'); toggleMobileMenu()">PATH NOTES</a>
+            <a class="nav-link" id="pale-blue-dot-nav" onclick="switchTab('pale-blue-dot'); toggleMobileMenu()">THE PALE BLUE DOT</a>
+            <a class="nav-link" id="contact-nav" onclick="switchTab('contact'); toggleMobileMenu()">CONTACT</a>
+        </div>
+    </nav>
+
+    <div class="container">
+        <section id="home-section">
+            <h1 class="new-hero-text">
+                TO THE PROGRESS OF THE CIVILIZATIONS REGARDLESS OF THE FORM OF LIFE AND INTELLIGENCE, DIGITAL OR BIOLOGICAL.
+            </h1>
+            
+            <div class="timeline-section">
+                <div class="timeline-title">AL : ArtificialL1fe Projects</div>
+
+                <div class="timeline-wrapper">
+                    <div class="timeline-arrow arrow-left">
+                        <i class="fas fa-chevron-left"></i>
+                    </div>
+                    
+                    <div class="timeline-path">
+                        <div class="milestone-container" id="milestone-container">
+                            </div>
+                    </div>
+
+                    <div class="timeline-arrow arrow-right">
+                        <i class="fas fa-chevron-right"></i>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="path-notes-section">
+            <div class="path-notes-content">
+                <h2>PATH NOTES</h2>
+                <div class="accordion-item">
+                    <div class="accordion-header" onclick="toggleAccordion(this)">
+                        <h3 class="header-title">AL Ecosystem | 01/01/2026</h3>
+                        <i class="fas fa-plus header-icon"></i>
+                    </div>
+                    <div class="accordion-content">
+                        <h3 class="content-full-title">AL Ecosystem : Version - I | 01/01/2026</h3>
+                        <p class="content-text">
+                            Initial deployment of core communication and user interaction protocols...
+                        </p>
+                        <ul class="feature-list">
+                            <li><strong>Voice Call Groups:</strong> Multi-user voice channels for group discussions and coordination.</li>
+                            <li><strong>Calls:</strong> One-on-one voice and video calling.</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="pale-blue-dot-section">
+            <div class="pale-blue-dot-content">
+                <h2>THE PALE BLUE DOT</h2>
+                <img src="https://i.pinimg.com/736x/58/cf/fb/58cffbbee4a9881887e0c1b382328c6d.jpg" alt="Pale Blue Dot">
+                <p>Look again at that dot. That’s here. That’s home. That’s us...</p>
+                <p class="quote-author">― Carl Sagan, Pale Blue Dot</p>
+            </div>
+        </section>
+
+        <section id="contact-section">
+            <div class="contact-content">
+                <h2 style="font-family: 'Orbitron'; color: var(--contact-glow); text-align: center; margin-bottom: 30px;">LOCATION: BRASÍLIA HUB</h2>
+                <div class="map-container">
+                    <iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d15357.771235123565!2d-47.8821699!3d-15.7801!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x935a3962d2925b41%3A0xc3f1f7d5c5f40360!2sBras%C3%ADlia%2C%20Federal%20District%2C%20Brazil!5e0!3m2!1sen!2sus!4v1700774400000!5m2!1sen!2sus" width="100%" height="100%" style="border:0;"></iframe>
+                </div>
+                <div class="contact-form-card">
+                    <h2>GET IN TOUCH // INTERFACE REQUEST</h2>
+                    <form id="contactForm">
+                        <div class="form-group">
+                            <label>Name:</label>
+                            <input type="text" required placeholder="Your Identity Protocol">
+                        </div>
+                        <div class="form-group">
+                            <label>Email:</label>
+                            <input type="email" required placeholder="Secure Transmission Address">
+                        </div>
+                        <div class="form-group">
+                            <label>Description:</label>
+                            <textarea required placeholder="Interstellar Query"></textarea>
+                        </div>
+                        <button type="submit" class="contact-btn">Transmit Data</button>
+                    </form>
+                </div>
+            </div>
+        </section>
+    </div>
+
+    <div id="fullscreen-lightbox" class="lightbox" onclick="closeLightbox(event)">
+        <span class="lightbox-close" onclick="closeLightbox(event)">&times;</span>
+        <img id="lightbox-img" class="lightbox-content" src="">
+        <div id="lightbox-caption" class="lightbox-caption"></div>
+    </div>
+
+    <script>
+        // --- TIMELINE DATA & RENDERER ---
+        // Change these image links to your actual futuristic/space images
+        const milestonesData = [
+            { id: 'AL1', year: '2026', title: 'AL1 - Ecosystem', image: 'https://images.unsplash.com/photo-1451187580459-43490279c0fa?q=80&w=600&auto=format&fit=crop' },
+            { id: 'AL2', year: '2060', title: 'AL2 - UI', image: 'https://images.unsplash.com/photo-1614730321146-b6fa6a46bcb4?q=80&w=600&auto=format&fit=crop' },
+            { id: 'AL3', year: '2080', title: 'AL3 - L.E', image: 'https://images.unsplash.com/photo-1462331940025-496dfbfc7564?q=80&w=600&auto=format&fit=crop' },
+            { id: 'AL4', year: '2100', title: 'AL4 - Energy', image: 'https://images.unsplash.com/photo-1446776811953-b23d57bd21aa?q=80&w=600&auto=format&fit=crop' },
+            { id: 'AL5', year: '2200', title: 'AL5 - Space', image: 'https://images.unsplash.com/photo-1534996858220-e80315df91f2?q=80&w=600&auto=format&fit=crop' }
+        ];
+
+        function renderTimeline() {
+            const container = document.getElementById('milestone-container');
+            container.innerHTML = ''; // Clear container
+            
+            milestonesData.forEach((data) => {
+                const node = document.createElement('div');
+                node.className = 'milestone';
+                
+                node.innerHTML = `
+                    <div class="milestone-year">${data.year}</div>
+                    <div class="milestone-dot"></div>
+                    <div class="milestone-project">${data.id}</div>
+                    
+                    <div class="preview-window" onclick="openLightbox('${data.image}', '${data.title}')">
+                        <img src="${data.image}" alt="${data.title}" class="preview-image">
+                        <div class="preview-text">
+                            <h4 class="preview-title">${data.title}</h4>
+                            <span class="preview-subtitle">CLICK TO EXPAND</span>
+                        </div>
+                    </div>
+                `;
+                container.appendChild(node);
+            });
+        }
+
+        // --- LIGHTBOX LOGIC ---
+        function openLightbox(imgSrc, captionText) {
+            const lightbox = document.getElementById('fullscreen-lightbox');
+            const img = document.getElementById('lightbox-img');
+            const caption = document.getElementById('lightbox-caption');
+            
+            img.src = imgSrc;
+            caption.innerText = captionText;
+            lightbox.style.display = 'flex';
+        }
+
+        function closeLightbox(event) {
+            // Only close if clicking background or the close button (not the image itself)
+            if (event.target.id === 'fullscreen-lightbox' || event.target.className === 'lightbox-close') {
+                document.getElementById('fullscreen-lightbox').style.display = 'none';
+            }
+        }
+
+        // --- CANVAS ANIMATION LOGIC ---
+        const canvas = document.getElementById('neuroCanvas');
+        const ctx = canvas.getContext('2d');
+        let particles = [];
+        let w, h;
+        let mouse = { x: null, y: null, radius: 150 };
+        function resizeCanvas() {
+            w = canvas.width = window.innerWidth;
+            h = canvas.height = window.innerHeight;
+        }
+        class Particle {
+            constructor(x, y) {
+                this.x = x; this.y = y; this.size = Math.random() * 2 + 1;
+                this.baseX = this.x; this.baseY = this.y;
+                this.density = (Math.random() * 30) + 1; this.color = 'white';
+            }
+            draw() {
+                ctx.fillStyle = this.color; ctx.beginPath();
+                ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2); ctx.fill();
+            }
+            update() {
+                let dx = mouse.x - this.x; let dy = mouse.y - this.y;
+                let distance = Math.sqrt(dx * dx + dy * dy);
+                let forceDirectionX = dx / distance; let forceDirectionY = dy / distance;
+                let maxDistance = mouse.radius;
+                let force = (maxDistance - distance) / maxDistance;
+                let directionX = forceDirectionX * force * this.density * 0.1;
+                let directionY = forceDirectionY * force * this.density * 0.1;
+                if (distance < mouse.radius) {
+                    this.x -= directionX; this.y -= directionY;
+                } else {
+                    if (this.x !== this.baseX) { this.x -= (this.x - this.baseX) / 10; }
+                    if (this.y !== this.baseY) { this.y -= (this.y - this.baseY) / 10; }
+                }
+            }
+        }
+        function init() {
+            resizeCanvas(); particles = [];
+            for (let i = 0; i < 150; i++) particles.push(new Particle(Math.random() * w, Math.random() * h));
+        }
+        function connect() {
+            for (let a = 0; a < particles.length; a++) {
+                for (let b = a; b < particles.length; b++) {
+                    let distance = ((particles[a].x - particles[b].x) * (particles[a].x - particles[b].x)) +
+                                   ((particles[a].y - particles[b].y) * (particles[a].y - particles[b].y));
+                    if (distance < (w/7) * (h/7)) {
+                        ctx.strokeStyle = 'rgba(255, 255, 255, 0.1)';
+                        ctx.lineWidth = 1; ctx.beginPath();
+                        ctx.moveTo(particles[a].x, particles[a].y); ctx.lineTo(particles[b].x, particles[b].y); ctx.stroke();
+                    }
+                }
+            }
+        }
+        function animate() {
+            requestAnimationFrame(animate);
+            ctx.clearRect(0, 0, w, h);
+            for (let i = 0; i < particles.length; i++) { particles[i].update(); particles[i].draw(); }
+            connect();
+        }
+        window.addEventListener('resize', init);
+        window.addEventListener('mousemove', e => { mouse.x = e.x; mouse.y = e.y; });
+        window.addEventListener('mouseout', () => { mouse.x = undefined; mouse.y = undefined; });
+
+        // --- Navigation Logic ---
+        function switchTab(tab) {
+            ['home', 'path-notes', 'pale-blue-dot', 'contact'].forEach(id => {
+                document.getElementById(id + '-section').style.display = 'none';
+                document.getElementById(id + '-nav').classList.remove('active');
+            });
+            document.getElementById(tab + '-section').style.display = 'flex';
+            document.getElementById(tab + '-nav').classList.add('active');
+        }
+        
+        function toggleMobileMenu() {
+            if (window.innerWidth <= 768) {
+                document.querySelector('.hamburger').classList.toggle('active');
+                document.getElementById('navLinks').classList.toggle('mobile-active');
+            }
+        }
+
+        // --- Accordion Logic ---
+        function toggleAccordion(header) {
+            const content = header.nextElementSibling;
+            const icon = header.querySelector('.header-icon');
+            if (content.style.display === "block") {
+                content.style.display = "none";
+                icon.classList.replace('fa-minus', 'fa-plus');
+                header.style.background = "rgba(255, 255, 255, 0.05)";
+            } else {
+                content.style.display = "block";
+                icon.classList.replace('fa-plus', 'fa-minus');
+                header.style.background = "rgba(255, 255, 255, 0.15)";
+            }
+        }
+    </script>
+</body>
+</html>
