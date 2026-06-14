@@ -448,7 +448,7 @@
             animation: fadeIn 1s ease;
         }
 
-        /* --- CONTACT — centered, no scroll, grey card like file 2 --- */
+        /* --- CONTACT — single frosted-glass mailto button, no card, no form --- */
         #contact-section {
             display: none;
             flex-direction: column;
@@ -459,40 +459,31 @@
             animation: fadeIn 1s ease;
         }
         .contact-content { width: 100%; max-width: 480px; margin: 0 auto; padding: 0 20px; }
-        .contact-form-card {
+        .contact-btn {
+            display: block;
+            width: 100%;
+            padding: 22px;
             background: rgba(255, 255, 255, 0.05);
             backdrop-filter: blur(20px);
-            padding: 40px;
-            border-radius: 20px;
+            -webkit-backdrop-filter: blur(20px);
             border: 1px solid rgba(255, 255, 255, 0.1);
             box-shadow: 0 0 60px rgba(255, 255, 255, 0.05);
-        }
-        .form-group { margin-bottom: 20px; }
-        .form-group input, .form-group textarea {
-            width: 100%; padding: 14px;
-            background: rgba(255, 255, 255, 0.05);
-            border: 1px solid rgba(255, 255, 255, 0.2);
-            color: #ffffff; border-radius: 10px;
-            font-family: 'Roboto Mono'; font-size: 15px;
-            box-sizing: border-box; transition: 0.3s;
-        }
-        .form-group input:focus, .form-group textarea:focus {
-            outline: none; border-color: #fff;
-            box-shadow: 0 0 10px rgba(255, 255, 255, 0.2);
-        }
-        .form-group textarea { resize: vertical; min-height: 100px; }
-        .form-group input::placeholder,
-        .form-group textarea::placeholder {
+            border-radius: 20px;
             color: #ffffff;
+            font-family: 'Orbitron';
+            font-size: 1.1rem; letter-spacing: 2px;
+            cursor: pointer;
+            transition: all 0.3s;
+            text-transform: uppercase; font-weight: bold;
+            text-align: center;
+            text-decoration: none;
+            box-sizing: border-box;
         }
-        .contact-btn {
-            width: 100%; padding: 15px; background: #ffffff;
-            border: none; color: #000000; font-family: 'Orbitron';
-            font-size: 1.1rem; letter-spacing: 2px; cursor: pointer;
-            border-radius: 10px; transition: background 0.3s;
-            text-transform: uppercase; font-weight: bold; margin-top: 5px;
+        .contact-btn:hover {
+            background: rgba(255, 255, 255, 0.1);
+            box-shadow: 0 0 80px rgba(255, 255, 255, 0.1);
+            border-color: rgba(255, 255, 255, 0.25);
         }
-        .contact-btn:hover { background: #dddddd; }
 
         /* --- MEDIA QUERIES --- */
         @media (max-width: 950px) {
@@ -529,11 +520,8 @@
                 padding: 0;
                 box-sizing: border-box;
             }
-            .contact-form-card {
-                padding: 24px 20px;
-                border-radius: 16px;
-            }
             .contact-btn {
+                padding: 18px;
                 font-size: 0.9rem;
                 letter-spacing: 1px;
             }
@@ -616,20 +604,10 @@
 
         <section id="contact-section">
             <div class="contact-content">
-                <div class="contact-form-card">
-                    <form id="contactForm">
-                        <div class="form-group">
-                            <input type="text" required placeholder="Your Name">
-                        </div>
-                        <div class="form-group">
-                            <input type="email" required placeholder="Your Email">
-                        </div>
-                        <div class="form-group">
-                            <textarea required placeholder="Message"></textarea>
-                        </div>
-                        <button type="submit" class="contact-btn">Send Message To AL</button>
-                    </form>
-                </div>
+                <a href="mailto:zorsenotsrow@outlook.com?subject=AL%20Contact"
+                   class="contact-btn">
+                    Send Message To AL
+                </a>
             </div>
         </section>
     </div>
